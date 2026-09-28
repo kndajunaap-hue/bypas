@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeoHUB • Delta Bypass Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --pink: #ff4d9e;
+    --purple: #a855f7;
+    --cyan: #00e5ff;
+    --bg: #07070d;
+    --card: rgba(18,18,28,.75);
+    --border: rgba(168,85,247,.35);
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: #eaeaf5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Sakura particles */
+  .sakura {
+    position: fixed; top: -10vh; pointer-events: none; z-index: 0;
+    font-size: 18px; opacity: .8;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: .9; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Aurora background */
+  .aurora {
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(168,85,247,.25), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(255,77,158,.20), transparent 45%),
+      radial-gradient(circle at 50% 80%, rgba(0,229,255,.18), transparent 50%),
+      linear-gradient(180deg, #07070d, #0b0b16);
+    animation: auroraShift 14s ease-in-out infinite alternate;
+  }
+  @keyframes auroraShift {
+    0%   { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(35deg); }
+  }
+
+  .wrap {
+    position: relative; z-index: 2;
+    max-width: 640px; margin: 0 auto; padding: 30px 22px 60px;
+  }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 26px; }
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 38px; font-weight: 900; letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(168,85,247,.55));
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%,100% { filter: drop-shadow(0 0 12px rgba(168,85,247,.5)); }
+    50%     { filter: drop-shadow(0 0 22px rgba(255,77,158,.75)); }
+  }
+  .tagline { font-size: 12px; color: #8a8aa0; letter-spacing: 2px; margin-top: 4px; }
+  .badge-anime {
+    display: inline-block; margin-top: 10px; padding: 4px 14px;
+    border-radius: 999px; font-size: 11px; letter-spacing: 1.5px;
+    background: linear-gradient(90deg, rgba(255,77,158,.18), rgba(0,229,255,.18));
+    border: 1px solid var(--border); color: #dcdcff;
+  }
+
+  /* Music player bar */
+  .music-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); backdrop-filter: blur(14px);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 10px 14px; margin-bottom: 20px;
+    box-shadow: 0 6px 28px rgba(0,0,0,.35);
+  }
+  .music-bar .disc {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--cyan), var(--purple), var(--pink), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; animation: spin 4s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .music-bar .info { flex: 1; font-size: 12px; color: #b8b8d0; }
+  .music-bar .info b { color: #fff; font-size: 13px; }
+  .music-bar button {
+    background: rgba(255,255,255,.06); border: 1px solid var(--border);
+    color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 12px;
+    cursor: pointer; transition: .2s;
+  }
+  .music-bar button:hover { background: rgba(168,85,247,.25); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px 6px; border-radius: 12px;
+    background: rgba(18,18,28,.6); border: 1px solid rgba(255,255,255,.08);
+    cursor: pointer; font-size: 12px; font-weight: 600; color: #9a9ab5;
+    transition: .25s; backdrop-filter: blur(10px);
+  }
+  .tab.active {
+    color: #fff; border-color: var(--pink);
+    background: linear-gradient(135deg, rgba(255,77,158,.22), rgba(168,85,247,.22));
+    box-shadow: 0 0 18px rgba(255,77,158,.25);
+  }
+
+  /* Panel card */
+  .panel { display: none; animation: fadeUp .35s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: var(--card); backdrop-filter: blur(16px);
+    border: 1px solid var(--border); border-radius: 18px;
+    padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.45);
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.06) 50%, transparent 60%);
+    transform: translateX(-100%); animation: shine 4s infinite;
+  }
+  @keyframes shine { 0%{transform:translateX(-100%)} 60%,100%{transform:translateX(100%)} }
+
+  .card h2 {
+    font-family: 'Orbitron', sans-serif; font-size: 15px; letter-spacing: 1.5px;
+    margin-bottom: 14px; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2 .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--pink); box-shadow: 0 0 10px var(--pink);
+  }
+
+  input, textarea {
+    width: 100%; padding: 12px 14px; margin-bottom: 10px;
+    background: rgba(10,10,18,.75); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px; color: #fff; font-size: 13px; font-family: 'Poppins', sans-serif;
+    outline: none; transition: .2s;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,.12);
+  }
+  input::placeholder { color: #55556e; }
+
+  button.primary {
+    width: 100%; padding: 13px; border: none; border-radius: 12px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+    background-size: 200% 100%;
+    color: #0a0a12; font-weight: 700; font-size: 14px; letter-spacing: .5px;
+    cursor: pointer; transition: .3s; font-family: 'Poppins', sans-serif;
+  }
+  button.primary:hover { background-position: 100% 0; box-shadow: 0 8px 24px rgba(168,85,247,.4); }
+  button.primary:disabled { opacity: .5; cursor: not-allowed; }
+
+  .result {
+    margin-top: 16px; padding: 14px; border-radius: 12px;
+    background: rgba(10,10,18,.8); border: 1px solid rgba(255,255,255,.08);
+    font-size: 12.5px; white-space: pre-wrap; word-break: break-all;
+    max-height: 380px; overflow: auto; display: none; line-height: 1.6;
+  }
+  .result.show { display: block; animation: fadeUp .3s ease; }
+  .result a { color: var(--cyan); text-decoration: none; }
+  .result a:hover { text-decoration: underline; }
+  .result video, .result img { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+
+  .chip {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 10.5px; letter-spacing: 1px; font-weight: 600;
+    background: rgba(0,229,255,.15); color: var(--cyan);
+    border: 1px solid rgba(0,229,255,.3); margin-bottom: 10px;
+  }
+  .chip.err { background: rgba(255,77,158,.15); color: var(--pink); border-color: rgba(255,77,158,.3); }
+
+  footer {
+    text-align: center; margin-top: 30px; font-size: 11px; color: #55556e;
+    letter-spacing: 1px;
+  }
+  footer b { color: var(--pink); }
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+
+<!-- Sakura petals -->
+<div class="sakura" style="left:8%;  animation-duration:11s; animation-delay:0s;">🌸</div>
+<div class="sakura" style="left:22%; animation-duration:14s; animation-delay:2s;">🌸</div>
+<div class="sakura" style="left:38%; animation-duration:12s; animation-delay:4s;">🌸</div>
+<div class="sakura" style="left:55%; animation-duration:15s; animation-delay:1s;">🌸</div>
+<div class="sakura" style="left:70%; animation-duration:10s; animation-delay:3s;">🌸</div>
+<div class="sakura" style="left:85%; animation-duration:13s; animation-delay:5s;">🌸</div>
+<div class="sakura" style="left:93%; animation-duration:16s; animation-delay:2.5s;">🌸</div>
+
+<div class="wrap">
+  <header>
+    <div class="logo">LEOHUB</div>
+    <div class="tagline">DELTA BYPASS SUITE</div>
+    <div class="badge-anime">⚡ ANIME EDITION ⚡</div>
+  </header>
+
+  <!-- Music Bar -->
+  <div class="music-bar">
+    <div class="disc">🎵</div>
+    <div class="info">
+      <b id="song-title">Memuat musik...</b><br>
+      <span id="song-status">Autoplay aktif</span>
+    </div>
+    <button id="music-toggle" onclick="toggleMusic()">⏸ Pause</button>
+    <button onclick="nextMusic()">⏭</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="delta">🔑 Delta Key</div>
+    <div class="tab" data-tab="tiktok">🎬 TikTok</div>
+    <div class="tab" data-tab="bypass">🔗 Bypass</div>
+  </div>
+
+  <!-- Delta Panel -->
+  <div class="panel active" id="panel-delta">
+    <div class="card">
+      <h2><span class="dot"></span> BYPASS KEY DELTA</h2>
+      <input id="delta-key" placeholder="Masukkan key Delta..." />
+      <input id="delta-hwid" placeholder="HWID (opsional)" />
+      <button class="primary" onclick="doDelta()">⚡ Bypass Sekarang</button>
+      <div class="result" id="res-delta"></div>
+    </div>
+  </div>
+
+  <!-- TikTok Panel -->
+  <div class="panel" id="panel-tiktok">
+    <div class="card">
+      <h2><span class="dot"></span> TIKTOK NO WATERMARK</h2>
+      <input id="tt-url" placeholder="https://vt.tiktok.com/..." />
+      <button class="primary" onclick="doTikTok()">🎬 Download No WM</button>
+      <div class="result" id="res-tiktok"></div>
+    </div>
+  </div>
+
+  <!-- Bypass Panel -->
+  <div class="panel" id="panel-bypass">
+    <div class="card">
+      <h2><span class="dot"></span> BYPASS LINK</h2>
+      <input id="by-url" placeholder="https://safelink / shortener..." />
+      <button class="primary" onclick="doBypass()">🔗 Bypass Link</button>
+      <div class="result" id="res-bypass"></div>
+    </div>
+  </div>
+
+  <footer>© <b>LeoHUB</b> • Anime Edition • Powered by Vercel</footer>
+</div>
+
+<!-- Audio element -->
+<audio id="bgm" loop></audio>
+
+<script>
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  };
+});
+
+/* ============ MUSIC AUTOPLAY RANDOM ============ */
+const bgm = document.getElementById('bgm');
+const songTitle = document.getElementById('song-title');
+const songStatus = document.getElementById('song-status');
+const toggleBtn = document.getElementById('music-toggle');
+let isPlaying = false;
+let trackIndex = 0;
+
+// Playlist lokal (bisa diganti lagu anime favoritmu)
+const LOCAL_PLAYLIST = [
+  { title: 'Anime OST — Sakura Dreams', src: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b1e2f9c1a.mp3' },
+  { title: 'Anime OST — Neon Tokyo',     src: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3' },
+  { title: 'Anime OST — Moonlight Path', src: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3' },
+  { title: 'Anime OST — Cherry Blossom', src: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc2c08e.mp3' },
+  { title: 'Anime OST — Spirit Wind',    src: 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_00fa5593f3.mp3' }
+];
+
+function pickRandomTrack() {
+  let i;
+  do { i = Math.floor(Math.random() * LOCAL_PLAYLIST.length); }
+  while (i === trackIndex && LOCAL_PLAYLIST.length > 1);
+  trackIndex = i;
+  return LOCAL_PLAYLIST[i];
+}
+
+function loadAndPlay(track) {
+  bgm.src = track.src;
+  songTitle.textContent = track.title;
+  songStatus.textContent = 'Autoplay aktif';
+  bgm.volume = 0.35;
+  bgm.play().then(() => {
+    isPlaying = true;
+    toggleBtn.textContent = '⏸ Pause';
+  }).catch(() => {
+    songStatus.textContent = 'Klik untuk memutar ▶';
+    isPlaying = false;
+    toggleBtn.textContent = '▶ Play';
+  });
+}
+
+function nextMusic() {
+  const track = pickRandomTrack();
+  loadAndPlay(track);
+}
+
+function toggleMusic() {
+  if (isPlaying) {
+    bgm.pause();
+    isPlaying = false;
+    toggleBtn.textContent = '▶ Play';
+    songStatus.textContent = 'Dijeda';
+  } else {
+    bgm.play().then(() => {
+      isPlaying = true;
+      toggleBtn.textContent = '⏸ Pause';
+      songStatus.textContent = 'Autoplay aktif';
+    });
+  }
+}
+
+// Saat lagu selesai → random lagi
+bgm.addEventListener('ended', nextMusic);
+
+// Inisialisasi autoplay (coba langsung)
+(function initMusic() {
+  const first = pickRandomTrack();
+  loadAndPlay(first);
+
+  // Fallback: browser blokir autoplay → mainkan setelah interaksi pertama
+  const unlock = () => {
+    if (!isPlaying) {
+      bgm.play().then(() => {
+        isPlaying = true;
+        toggleBtn.textContent = '⏸ Pause';
+        songStatus.textContent = 'Autoplay aktif';
+      }).catch(() => {});
+    }
+    document.removeEventListener('click', unlock);
+    document.removeEventListener('touchstart', unlock);
+    document.removeEventListener('keydown', unlock);
+  };
+  document.addEventListener('click', unlock);
+  document.addEventListener('touchstart', unlock);
+  document.addEventListener('keydown', unlock);
+})();
+
+/* ============ API CALLS ============ */
+function show(id, html) {
+  const el = document.getElementById(id);
+  el.innerHTML = html;
+  el.classList.add('show');
+}
+
+async function doDelta() {
+  const key = document.getElementById('delta-key').value.trim();
+  const hwid = document.getElementById('delta-hwid').value.trim();
+  if (!key) return alert('Isi key dulu');
+  show('res-delta', '⏳ Memproses bypass...');
+  try {
+    const r = await fetch(`/api/delta?key=${encodeURIComponent(key)}&hwid=${encodeURIComponent(hwid)}`);
+    const j = await r.json();
+    show('res-delta', `<span class="chip">${j.status ? 'SUKSES' : 'GAGAL'}</span>\n${JSON.stringify(j, null, 2)}`);
+  } catch (e) { show('res-delta', `<span class="chip err">ERROR</span>\n${e.message}`); }
+}
+
+async function doTikTok() {
+  const url = document.getElementById('tt-url').value.trim();
+  if (!url) return alert('Isi URL TikTok');
+  show('res-tiktok', '⏳ Mengambil video...');
+  try {
+    const r = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+    const j = await r.json();
+    if (!j.status) return show('res-tiktok', `<span class="chip err">GAGAL</span>\n${j.message}`);
+    let html = `<span class="chip">${j.source || 'OK'}</span>\n`;
+    html += `<b>${j.title || '-'}</b>\nAuthor: ${j.author || '-'}\n\n`;
+    if (j.hd)   html += `<a href="${j.hd}" target="_blank">⬇ Download HD (No WM)</a>\n`;
+    if (j.play) html += `<a href="${j.play}" target="_blank">⬇ Download SD (No WM)</a>\n`;
+    if (j.music) html += `<a href="${j.music}" target="_blank">🎵 Music</a>\n`;
+    if (j.hd) html += `<video src="${j.hd}" controls></video>`;
+    show('res-tiktok', html);
+  } catch (e) { show('res-tiktok', `<span class="chip err">ERROR</span>\n${e.message}`); }
+}
+
+async function doBypass() {
+  const url = document.getElementById('by-url').value.trim();
+  if (!url) return alert('Isi URL');
+  show('res-bypass', '⏳ Memproses bypass...');
+  try {
+    const r = await fetch(`/api/bypass?url=${encodeURIComponent(url)}`);
+    const j = await r.json();
+    if (!j.status) return show('res-bypass', `<span class="chip err">GAGAL</span>\n${j.message}`);
+    let html = `<span class="chip">BYPASS</span>\n`;
+    html += `<b>Final URL:</b>\n<a href="${j.final}" target="_blank">${j.final}</a>\n\n`;
+    if (j.metaRefresh) html += `<b>Meta Refresh:</b> <a href="${j.metaRefresh}" target="_blank">${j.metaRefresh}</a>\n\n`;
+    if (j.links?.length) {
+      html += `<b>Links ditemukan (${j.links.length}):</b>\n`;
+      j.links.slice(0, 20).forEach(l => { html += `<a href="${l.href}" target="_blank">${l.text || l.href}</a>\n`; });
+    }
+    show('res-bypass', html);
+  } catch (e) { show('res-bypass', `<span class="chip err">ERROR</span>\n${e.message}`); }
+}
+</script>
+</body>
+</html>
